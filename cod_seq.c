@@ -47,11 +47,16 @@ float calcular_fitness(Individuo individuo) {
     int sanidade = binario_para_inteiro(individuo.genes, 24, 31);
     int doenca = binario_para_inteiro(individuo.genes, 32, 39);
 
-    float fitness = (100 - (rad * PESO_RAD * 100 /255)) 
-                    - (fome * PESO_FOME * 100 / 255) 
-                    + (energia * PESO_ENERGIA * 100/255)
-                    + (sanidade * PESO_SANIDADE * 100/255) 
-                    - (doenca * PESO_DOENCA * 100 /255);
+    float somaPesos = PESO_RAD + PESO_FOME + PESO_ENERGIA + PESO_SANIDADE + PESO_DOENCA;
+
+    float fitness = (
+
+        ((255 - rad) / 255.0) * PESO_RAD +
+        ((255 - fome) / 255.0) * PESO_FOME +
+        (energia / 255.0) * PESO_ENERGIA +
+        (sanidade / 255.0) * PESO_SANIDADE +
+        ((255 - doenca) / 255.0) * PESO_DOENCA        
+    ) * (100 / somaPesos);
 
     return fitness;
 }
@@ -107,11 +112,13 @@ void mutacao(Individuo *individuo) {
     individuo->fitness = calcular_fitness(*individuo);
 }
 
-// Impressão
+// Impressão/
 void imprimir_individuo(Individuo ind) {
+   
     for (int i = 0; i < TAM_CROMOSSOMO; i++) {
-        printf("%d", ind.genes[i]);
+        printf("Genoma: %d", ind.genes[i]);
     }
+     printf("\n");
     int rad = binario_para_inteiro(ind.genes, 0, 7);
     int fome = binario_para_inteiro(ind.genes, 8, 15);
     int energia = binario_para_inteiro(ind.genes, 16, 23);
@@ -132,7 +139,10 @@ void imprimir_populacao (Individuo *individuo, int geracao)
 {
         printf("\n==== População - Geração %d ====\n", geracao);
         for ( int i = 0; i<TAM_POPULACAO; i++){
+
+            printf("Individo %d\n", i);
             imprimir_individuo(individuo[i]); 
+            printf("\n");
         }
 }
 
