@@ -125,7 +125,7 @@ void imprimir_populacao (Individuo *individuo, int geracao)
 {
         printf("\n==== População - Geração %d ====\n", geracao);
         for ( int i = 0; i<TAM_POPULACAO; i++){
-            imprimir_individuo(individuo[i], i); 
+            imprimir_individuo(individuo[i]); 
         }
 }
 
