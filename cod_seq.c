@@ -7,22 +7,25 @@
 
 #define BITS_POR_GENE 8
 #define NUM_GENES 5
-#define TAM_CROMOSSOMO (BITS_POR_GENE * NUM_GENES)
-
 #define TAM_POPULACAO 5
+#define TAM_CROMOSSOMO (BITS_POR_GENE * NUM_GENES)
 #define MAX_GER 10
+#define RAD_MAX 2
 
-#define PROB_CROSSOVER 0.8
-#define PROB_MUTACAO 0.3
+// Daqui mudar para deixar aleatorio
 
-#define LIMIAR_MORTE 40 
 
-// Pesos dos genes para fitness
-#define PESO_RAD 0.2
-#define PESO_FOME 0.15
-#define PESO_ENERGIA 0.35
-#define PESO_SANIDADE 0.2
-#define PESO_DOENCA 0.1
+float PROB_CROSSOVER ;
+float PROB_MUTACAO ;
+
+int LIMIAR_MORTE ; 
+
+float PESO_RAD;
+float PESO_FOME;
+float PESO_ENERGIA;
+float PESO_SANIDADE;
+float PESO_DOENCA;
+    
 
 typedef struct {
     int genes[TAM_CROMOSSOMO];
@@ -38,6 +41,8 @@ Individuo mutacao(Individuo individuo);
 void imprimir_populacao (Individuo populacao[], int geracao);
 void imprimir_individuo(Individuo ind); 
 void aplicar_morte(Individuo populacao[], int geracao);
+void inicializar_parametros();
+
 
 // ------------------ MAIN ------------------
 
@@ -45,10 +50,150 @@ void aplicar_morte(Individuo populacao[], int geracao);
 int main() {
     srand(time(NULL));
 
+    printf("\n\n============= INICIANDO A BUSCA PELO MELHOR INDIVIDUO =============\n\n");
+
+    inicializar_parametros();
+
     Individuo populacao[TAM_POPULACAO];
     Individuo nova_geracao[TAM_POPULACAO];
 
+    
+
+    inicializar_populacao(populacao);
+
+
+    for (int geracao = 0; geracao < MAX_GER; geracao++) {
+
+        for (int i = 0; i < TAM_POPULACAO; i += 2) {
+            Individuo pai = torneio(populacao);
+            Individuo mae = torneio(populacao);
+
+            Individuo filho1, filho2;
+            cruzamento(pai, mae, &filho1, &filho2);
+
+            filho1 = mutacao(filho1);
+            filho2 = mutacao(filho2);
+
+            nova_geracao[i] = filho1;
+            nova_geracao[i + 1] = filho2;
+        }
+
+        // Substituir população
+        for (int i = 0; i < TAM_POPULACAO; i++) {
+            populacao[i] = nova_geracao[i];
+        }
+
+        aplicar_morte(populacao, geracao);
+
+        // Encontrar o melhor da geração
+        Individuo melhor = populacao[0];
+        for (int i = 1; i < TAM_POPULACAO; i++) {
+            if (populacao[i].fitness > melhor.fitness) {
+                melhor = populacao[i];
+            }
+        }
+
+        imprimir_populacao(populacao, geracao);
+       
+
+        printf("\n>>> Geracao %d | Melhor Fitness: %.2f\n", geracao, melhor.fitness);
+        imprimir_individuo(melhor);
+    }
+
+
     printf("\n\n============= INICIANDO A BUSCA PELO MELHOR INDIVIDUO =============\n\n");
+
+    inicializar_parametros();
+
+    inicializar_populacao(populacao);
+
+
+    for (int geracao = 0; geracao < MAX_GER; geracao++) {
+
+        for (int i = 0; i < TAM_POPULACAO; i += 2) {
+            Individuo pai = torneio(populacao);
+            Individuo mae = torneio(populacao);
+
+            Individuo filho1, filho2;
+            cruzamento(pai, mae, &filho1, &filho2);
+
+            filho1 = mutacao(filho1);
+            filho2 = mutacao(filho2);
+
+            nova_geracao[i] = filho1;
+            nova_geracao[i + 1] = filho2;
+        }
+
+        // Substituir população
+        for (int i = 0; i < TAM_POPULACAO; i++) {
+            populacao[i] = nova_geracao[i];
+        }
+
+        aplicar_morte(populacao, geracao);
+
+        // Encontrar o melhor da geração
+        Individuo melhor = populacao[0];
+        for (int i = 1; i < TAM_POPULACAO; i++) {
+            if (populacao[i].fitness > melhor.fitness) {
+                melhor = populacao[i];
+            }
+        }
+
+        imprimir_populacao(populacao, geracao);
+       
+
+        printf("\n>>> Geracao %d | Melhor Fitness: %.2f\n", geracao, melhor.fitness);
+        imprimir_individuo(melhor);
+    }
+
+    printf("\n\n============= INICIANDO A BUSCA PELO MELHOR INDIVIDUO =============\n\n");
+
+    inicializar_parametros();
+    
+    inicializar_populacao(populacao);
+
+
+    for (int geracao = 0; geracao < MAX_GER; geracao++) {
+
+        for (int i = 0; i < TAM_POPULACAO; i += 2) {
+            Individuo pai = torneio(populacao);
+            Individuo mae = torneio(populacao);
+
+            Individuo filho1, filho2;
+            cruzamento(pai, mae, &filho1, &filho2);
+
+            filho1 = mutacao(filho1);
+            filho2 = mutacao(filho2);
+
+            nova_geracao[i] = filho1;
+            nova_geracao[i + 1] = filho2;
+        }
+
+        // Substituir população
+        for (int i = 0; i < TAM_POPULACAO; i++) {
+            populacao[i] = nova_geracao[i];
+        }
+
+        aplicar_morte(populacao, geracao);
+
+        // Encontrar o melhor da geração
+        Individuo melhor = populacao[0];
+        for (int i = 1; i < TAM_POPULACAO; i++) {
+            if (populacao[i].fitness > melhor.fitness) {
+                melhor = populacao[i];
+            }
+        }
+
+        imprimir_populacao(populacao, geracao);
+       
+
+        printf("\n>>> Geracao %d | Melhor Fitness: %.2f\n", geracao, melhor.fitness);
+        imprimir_individuo(melhor);
+    }
+
+    printf("\n\n============= INICIANDO A BUSCA PELO MELHOR INDIVIDUO =============\n\n");
+    
+    inicializar_parametros();
 
     inicializar_populacao(populacao);
 
@@ -251,6 +396,37 @@ void aplicar_morte(Individuo populacao[], int geracao) {
     }
 }
 
+void inicializar_parametros() {
+    // Probabilidades entre 0 e 1
+    PROB_CROSSOVER = (float)rand() / RAND_MAX;
+    PROB_MUTACAO = (float)rand() / RAND_MAX;
+
+    // Limiar de morte entre 0 e 100
+    LIMIAR_MORTE = rand() % 101;
+
+    // Pesos aleatórios e normalização
+    float pesos[5];
+    float soma = 0.0;
+    for (int i = 0; i < 5; i++) {
+        pesos[i] = (float)rand() / RAND_MAX;
+        soma += pesos[i];
+    }
+    PESO_RAD = pesos[0] / soma;
+    PESO_FOME = pesos[1] / soma;
+    PESO_ENERGIA = pesos[2] / soma;
+    PESO_SANIDADE = pesos[3] / soma;
+    PESO_DOENCA = pesos[4] / soma;
+
+    printf("\n==== Estatistica - Dadas ====\n");
+    // Exibir os valores sorteados para conferência
+    printf("CHEGADAS DE DADOS PARA NOVA POPULACAO\n");
+    printf("PROB_CROSSOVER: %.2f\n", PROB_CROSSOVER);
+    printf("PROB_MUTACAO: %.2f\n", PROB_MUTACAO);
+    printf("LIMIAR_MORTE: %d\n", LIMIAR_MORTE);
+    printf("PESOS: RAD=%.2f, FOME=%.2f, ENERGIA=%.2f, SANIDADE=%.2f, DOENCA=%.2f (soma=%.2f)\n",
+        PESO_RAD, PESO_FOME, PESO_ENERGIA, PESO_SANIDADE, PESO_DOENCA,
+        PESO_RAD + PESO_FOME + PESO_ENERGIA + PESO_SANIDADE + PESO_DOENCA);
+}
 
 
 
