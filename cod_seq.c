@@ -4,6 +4,7 @@
 #include <stdlib.h>
 #include <math.h>
 #include <time.h>
+#include <ctype.h>
 
 #define BITS_POR_GENE 8
 #define NUM_GENES 5
@@ -13,16 +14,16 @@
 #define MAX_GER 100
 
 #define PROB_CROSSOVER 0.8
-#define PROB_MUTACAO 0.01
+#define PROB_MUTACAO 0.3
 
 #define LIMIAR_MORTE 40 
 
 // Pesos dos genes para fitness
-#define PESO_RAD 0.4
-#define PESO_FOME 0.2
-#define PESO_ENERGIA 0.4
+#define PESO_RAD 0.2
+#define PESO_FOME 0.15
+#define PESO_ENERGIA 0.35
 #define PESO_SANIDADE 0.2
-#define PESO_DOENCA 0.2
+#define PESO_DOENCA 0.1
 
 typedef struct {
     int genes[TAM_CROMOSSOMO];
@@ -117,8 +118,14 @@ void imprimir_individuo(Individuo ind) {
     int sanidade = binario_para_inteiro(ind.genes, 24, 31);
     int doenca = binario_para_inteiro(ind.genes, 32, 39);
 
-    printf(" | Radiação: %d, Fome: %d, Energia: %d, Sanidade: %d, Doença: %d | Fitness: %.2f\n",
-           rad, fome, energia, sanidade, doenca, ind.fitness);
+    int rad_pct = rad / 255.0 * 100;
+    int fome_pct = fome / 255.0 * 100;
+    int energia_pct = energia / 255.0 * 100;
+    int sanidade_pct = sanidade / 255.0 * 100;
+    int doenca_pct = doenca / 255.0 * 100;
+
+    printf(" | Radiação: %d%%, Fome: %d%%, Energia: %d%%, Sanidade: %d%%, Doença: %d%% | Fitness: %.2f\n",
+       rad_pct, fome_pct, energia_pct, sanidade_pct, doenca_pct, ind.fitness);
 }
 
 void imprimir_populacao (Individuo *individuo, int geracao)
@@ -134,12 +141,18 @@ void aplicar_morte(Individuo *populacao){
     for (int i = 0; i < TAM_POPULACAO; i++){
         
         if (populacao[i].fitness < LIMIAR_MORTE){
-        
+
+        printf("\nIndividuo %d morreu (fitness %.2f abaixo do limiar %.2f)\n", 
+                i, populacao[i].fitness, LIMIAR_MORTE);
+
+        printf("Nova expedição, buscando novo individuo %d com genes: ", i);
         for (int j = 0; j < TAM_CROMOSSOMO; j++) {
                 populacao[i].genes[j] = rand() % 2;
             }
         
         populacao[i].fitness = calcular_fitness(populacao[i]);
+        printf("\nNovo individuo %d resgatado pela colonia com fitness %.2f\n", 
+                i, populacao[i].fitness);
         }
         
     }
