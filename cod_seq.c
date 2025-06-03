@@ -115,10 +115,12 @@ void mutacao(Individuo *individuo) {
 // Impressão/
 void imprimir_individuo(Individuo ind) {
    
+   printf("Genoma: ");
     for (int i = 0; i < TAM_CROMOSSOMO; i++) {
         printf("Genoma: %d", ind.genes[i]);
     }
-     printf("\n");
+    printf("\n");
+    
     int rad = binario_para_inteiro(ind.genes, 0, 7);
     int fome = binario_para_inteiro(ind.genes, 8, 15);
     int energia = binario_para_inteiro(ind.genes, 16, 23);
