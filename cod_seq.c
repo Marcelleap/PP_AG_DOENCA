@@ -87,7 +87,7 @@ int main() {
         imprimir_populacao(populacao, geracao);
        
 
-        printf("\n>>> Geracao %d | Melhor Fitness: %.2f\n", geracao+1, melhor.fitness);
+        printf("\n>>> Geracao %d | Melhor Fitness: %.2f\n", geracao, melhor.fitness);
         imprimir_individuo(melhor);
     }
 
@@ -195,10 +195,10 @@ Individuo mutacao(Individuo individuo) {
 
 void imprimir_populacao (Individuo populacao[], int geracao)
 {
-        printf("\n==== Populacao - Geracao %d ====\n", geracao+1);
+        printf("\n==== Populacao - Geracao %d ====\n", geracao);
         
         for (int i = 0; i<TAM_POPULACAO; i++){
-            printf("Individo %d\n", i+1);
+            printf("Individuo %d\n", i);
             imprimir_individuo(populacao[i]); 
             printf("\n");
         }
@@ -235,9 +235,9 @@ void aplicar_morte(Individuo populacao[], int geracao) {
     for (int i = 0; i < TAM_POPULACAO; i++) {
         if (populacao[i].fitness < LIMIAR_MORTE) {
             printf("\n[Geracao %d] Individuo %d morreu (fitness %.2f abaixo do limiar %d)\n", 
-                    geracao+1, i, populacao[i].fitness, LIMIAR_MORTE);
+                    geracao, i, populacao[i].fitness, LIMIAR_MORTE);
 
-            printf("[Geracao %d] Nova expedicao buscando novo individuo %d com genes: ", geracao+1, i);
+            printf("[Geracao %d] Nova expedicao buscando novo individuo %d com genes: ", geracao, i);
             
             for (int j = 0; j < TAM_CROMOSSOMO; j++) {
                 populacao[i].genes[j] = rand() % 2;
@@ -246,7 +246,7 @@ void aplicar_morte(Individuo populacao[], int geracao) {
         
             populacao[i].fitness = calcular_fitness(populacao[i]);
             printf("\n[Geracao %d] Novo individuo %d resgatado pela colonia com fitness %.2f\n", 
-                    geracao+1, i, populacao[i].fitness);
+                    geracao, i, populacao[i].fitness);
         }
     }
 }
