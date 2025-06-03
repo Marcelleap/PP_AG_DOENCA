@@ -142,7 +142,7 @@ void aplicar_morte(Individuo *populacao){
         
         if (populacao[i].fitness < LIMIAR_MORTE){
 
-        printf("\nIndividuo %d morreu (fitness %.2f abaixo do limiar %.2f)\n", 
+        printf("\nIndividuo %d morreu (fitness %.2f abaixo do limiar %d)\n", 
                 i, populacao[i].fitness, LIMIAR_MORTE);
 
         printf("Nova expedição, buscando novo individuo %d com genes: ", i);
