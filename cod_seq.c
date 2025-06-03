@@ -15,6 +15,8 @@
 #define PROB_CROSSOVER 0.8
 #define PROB_MUTACAO 0.01
 
+#define LIMIAR_MORTE 40 
+
 // Pesos dos genes para fitness
 #define PESO_RAD 0.4
 #define PESO_FOME 0.2
@@ -44,8 +46,11 @@ float calcular_fitness(Individuo individuo) {
     int sanidade = binario_para_inteiro(individuo.genes, 24, 31);
     int doenca = binario_para_inteiro(individuo.genes, 32, 39);
 
-    float fitness = (rad * PESO_RAD) + (fome * PESO_FOME) + (energia * PESO_ENERGIA)
-                  + (sanidade * PESO_SANIDADE) + (doenca * PESO_DOENCA);
+    float fitness = (100 - (rad * PESO_RAD * 100 /255)) 
+                    - (fome * PESO_FOME * 100 / 255) 
+                    + (energia * PESO_ENERGIA * 100/255)
+                    + (sanidade * PESO_SANIDADE * 100/255) 
+                    - (doenca * PESO_DOENCA * 100 /255);
 
     return fitness;
 }
@@ -112,8 +117,33 @@ void imprimir_individuo(Individuo ind) {
     int sanidade = binario_para_inteiro(ind.genes, 24, 31);
     int doenca = binario_para_inteiro(ind.genes, 32, 39);
 
-    printf(" | Rad: %d, Fome: %d, Energia: %d, Sanidade: %d, Doença: %d | Fitness: %.2f\n",
+    printf(" | Radiação: %d, Fome: %d, Energia: %d, Sanidade: %d, Doença: %d | Fitness: %.2f\n",
            rad, fome, energia, sanidade, doenca, ind.fitness);
+}
+
+void imprimir_populacao (Individuo *individuo, int geracao)
+{
+        printf("\n==== População - Geração %d ====\n", geracao);
+        for ( int i = 0; i<TAM_POPULACAO; i++){
+            imprimir_individuo(individuo[i], i); 
+        }
+}
+
+void aplicar_morte(Individuo *populacao){
+
+    for (int i = 0; i < TAM_POPULACAO; i++){
+        
+        if (populacao[i].fitness < LIMIAR_MORTE){
+        
+        for (int j = 0; j < TAM_CROMOSSOMO; j++) {
+                populacao[i].genes[j] = rand() % 2;
+            }
+        
+        populacao[i].fitness = calcular_fitness(populacao[i]);
+        }
+        
+    }
+    
 }
 
 // ------------------ MAIN ------------------
@@ -152,6 +182,10 @@ int main() {
                 melhor = populacao[i];
             }
         }
+
+        aplicar_morte(populacao);
+
+        imprimir_populacao(populacao,geracao);
 
         printf("Geração %d | Melhor Fitness: %.2f\n", geracao + 1, melhor.fitness);
         imprimir_individuo(melhor);
