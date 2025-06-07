@@ -4,6 +4,7 @@
 #include <stdlib.h>
 #include <math.h>
 #include <time.h>
+#include "mpi.h"
 
 #define BITS_POR_GENE 8
 #define NUM_GENES 5
@@ -47,195 +48,212 @@ void inicializar_parametros();
 // ------------------ MAIN ------------------
 
 
-int main() {
-    srand(time(NULL));
-
-    printf("\n\n============= INICIANDO A BUSCA PELO MELHOR INDIVIDUO =============\n\n");
-
-    inicializar_parametros();
+int main(int argc, char *argv[]) {
+    int ret, rank, size, i, tag;
+    MPI_Status status;
+    char message[12];
+    ret = MPI_Init(&argc, &argv);
+    ret = MPI_Comm_rank(MPI_COMM_WORLD, &rank);
+    ret = MPI_Comm_size(MPI_COMM_WORLD, &size);
+    tag=100;
 
     Individuo populacao[TAM_POPULACAO];
     Individuo nova_geracao[TAM_POPULACAO];
 
+    srand(time(NULL));
+
+    if (rank == 0){
+        printf("\n\n============= INICIANDO A BUSCA PELO MELHOR INDIVIDUO =============\n\n");
+
+        inicializar_parametros();
+
+
+
+        
+
+        inicializar_populacao(populacao);
+
+
+        for (int geracao = 0; geracao < MAX_GER; geracao++) {
+
+            for (int i = 0; i < TAM_POPULACAO; i += 2) {
+                Individuo pai = torneio(populacao);
+                Individuo mae = torneio(populacao);
+
+                Individuo filho1, filho2;
+                cruzamento(pai, mae, &filho1, &filho2);
+
+                filho1 = mutacao(filho1);
+                filho2 = mutacao(filho2);
+
+                nova_geracao[i] = filho1;
+                nova_geracao[i + 1] = filho2;
+            }
+
+            // Substituir população
+            for (int i = 0; i < TAM_POPULACAO; i++) {
+                populacao[i] = nova_geracao[i];
+            }
+
+            aplicar_morte(populacao, geracao);
+
+            // Encontrar o melhor da geração
+            Individuo melhor = populacao[0];
+            for (int i = 1; i < TAM_POPULACAO; i++) {
+                if (populacao[i].fitness > melhor.fitness) {
+                    melhor = populacao[i];
+                }
+            }
+
+            imprimir_populacao(populacao, geracao);
+        
+            //teste com cor no terminal
+            printf("\033[103m\n>>> Geracao %d | Melhor Fitness: %.2f\n\033[0m", geracao, melhor.fitness);
+            imprimir_individuo(melhor);
+        }
+
+    }
     
+    if (rank == 1){
+        printf("\n\n============= INICIANDO A BUSCA PELO MELHOR INDIVIDUO =============\n\n");
 
-    inicializar_populacao(populacao);
+        inicializar_parametros();
+
+        inicializar_populacao(populacao);
 
 
-    for (int geracao = 0; geracao < MAX_GER; geracao++) {
+        for (int geracao = 0; geracao < MAX_GER; geracao++) {
 
-        for (int i = 0; i < TAM_POPULACAO; i += 2) {
-            Individuo pai = torneio(populacao);
-            Individuo mae = torneio(populacao);
+            for (int i = 0; i < TAM_POPULACAO; i += 2) {
+                Individuo pai = torneio(populacao);
+                Individuo mae = torneio(populacao);
 
-            Individuo filho1, filho2;
-            cruzamento(pai, mae, &filho1, &filho2);
+                Individuo filho1, filho2;
+                cruzamento(pai, mae, &filho1, &filho2);
 
-            filho1 = mutacao(filho1);
-            filho2 = mutacao(filho2);
+                filho1 = mutacao(filho1);
+                filho2 = mutacao(filho2);
 
-            nova_geracao[i] = filho1;
-            nova_geracao[i + 1] = filho2;
-        }
-
-        // Substituir população
-        for (int i = 0; i < TAM_POPULACAO; i++) {
-            populacao[i] = nova_geracao[i];
-        }
-
-        aplicar_morte(populacao, geracao);
-
-        // Encontrar o melhor da geração
-        Individuo melhor = populacao[0];
-        for (int i = 1; i < TAM_POPULACAO; i++) {
-            if (populacao[i].fitness > melhor.fitness) {
-                melhor = populacao[i];
+                nova_geracao[i] = filho1;
+                nova_geracao[i + 1] = filho2;
             }
+
+            // Substituir população
+            for (int i = 0; i < TAM_POPULACAO; i++) {
+                populacao[i] = nova_geracao[i];
+            }
+
+            aplicar_morte(populacao, geracao);
+
+            // Encontrar o melhor da geração
+            Individuo melhor = populacao[0];
+            for (int i = 1; i < TAM_POPULACAO; i++) {
+                if (populacao[i].fitness > melhor.fitness) {
+                    melhor = populacao[i];
+                }
+            }
+
+            imprimir_populacao(populacao, geracao);
+        
+
+            printf("\n>>> Geracao %d | Melhor Fitness: %.2f\n", geracao, melhor.fitness);
+            imprimir_individuo(melhor);
         }
-
-        imprimir_populacao(populacao, geracao);
-       
-
-        printf("\n>>> Geracao %d | Melhor Fitness: %.2f\n", geracao, melhor.fitness);
-        imprimir_individuo(melhor);
     }
 
+    if (rank == 2){
+        printf("\n\n============= INICIANDO A BUSCA PELO MELHOR INDIVIDUO =============\n\n");
 
-    printf("\n\n============= INICIANDO A BUSCA PELO MELHOR INDIVIDUO =============\n\n");
-
-    inicializar_parametros();
-
-    inicializar_populacao(populacao);
+        inicializar_parametros();
+        
+        inicializar_populacao(populacao);
 
 
-    for (int geracao = 0; geracao < MAX_GER; geracao++) {
+        for (int geracao = 0; geracao < MAX_GER; geracao++) {
 
-        for (int i = 0; i < TAM_POPULACAO; i += 2) {
-            Individuo pai = torneio(populacao);
-            Individuo mae = torneio(populacao);
+            for (int i = 0; i < TAM_POPULACAO; i += 2) {
+                Individuo pai = torneio(populacao);
+                Individuo mae = torneio(populacao);
 
-            Individuo filho1, filho2;
-            cruzamento(pai, mae, &filho1, &filho2);
+                Individuo filho1, filho2;
+                cruzamento(pai, mae, &filho1, &filho2);
 
-            filho1 = mutacao(filho1);
-            filho2 = mutacao(filho2);
+                filho1 = mutacao(filho1);
+                filho2 = mutacao(filho2);
 
-            nova_geracao[i] = filho1;
-            nova_geracao[i + 1] = filho2;
-        }
-
-        // Substituir população
-        for (int i = 0; i < TAM_POPULACAO; i++) {
-            populacao[i] = nova_geracao[i];
-        }
-
-        aplicar_morte(populacao, geracao);
-
-        // Encontrar o melhor da geração
-        Individuo melhor = populacao[0];
-        for (int i = 1; i < TAM_POPULACAO; i++) {
-            if (populacao[i].fitness > melhor.fitness) {
-                melhor = populacao[i];
+                nova_geracao[i] = filho1;
+                nova_geracao[i + 1] = filho2;
             }
-        }
 
-        imprimir_populacao(populacao, geracao);
-       
-
-        printf("\n>>> Geracao %d | Melhor Fitness: %.2f\n", geracao, melhor.fitness);
-        imprimir_individuo(melhor);
-    }
-
-    printf("\n\n============= INICIANDO A BUSCA PELO MELHOR INDIVIDUO =============\n\n");
-
-    inicializar_parametros();
-    
-    inicializar_populacao(populacao);
-
-
-    for (int geracao = 0; geracao < MAX_GER; geracao++) {
-
-        for (int i = 0; i < TAM_POPULACAO; i += 2) {
-            Individuo pai = torneio(populacao);
-            Individuo mae = torneio(populacao);
-
-            Individuo filho1, filho2;
-            cruzamento(pai, mae, &filho1, &filho2);
-
-            filho1 = mutacao(filho1);
-            filho2 = mutacao(filho2);
-
-            nova_geracao[i] = filho1;
-            nova_geracao[i + 1] = filho2;
-        }
-
-        // Substituir população
-        for (int i = 0; i < TAM_POPULACAO; i++) {
-            populacao[i] = nova_geracao[i];
-        }
-
-        aplicar_morte(populacao, geracao);
-
-        // Encontrar o melhor da geração
-        Individuo melhor = populacao[0];
-        for (int i = 1; i < TAM_POPULACAO; i++) {
-            if (populacao[i].fitness > melhor.fitness) {
-                melhor = populacao[i];
+            // Substituir população
+            for (int i = 0; i < TAM_POPULACAO; i++) {
+                populacao[i] = nova_geracao[i];
             }
-        }
 
-        imprimir_populacao(populacao, geracao);
-       
+            aplicar_morte(populacao, geracao);
 
-        printf("\n>>> Geracao %d | Melhor Fitness: %.2f\n", geracao, melhor.fitness);
-        imprimir_individuo(melhor);
-    }
-
-    printf("\n\n============= INICIANDO A BUSCA PELO MELHOR INDIVIDUO =============\n\n");
-    
-    inicializar_parametros();
-
-    inicializar_populacao(populacao);
-
-
-    for (int geracao = 0; geracao < MAX_GER; geracao++) {
-
-        for (int i = 0; i < TAM_POPULACAO; i += 2) {
-            Individuo pai = torneio(populacao);
-            Individuo mae = torneio(populacao);
-
-            Individuo filho1, filho2;
-            cruzamento(pai, mae, &filho1, &filho2);
-
-            filho1 = mutacao(filho1);
-            filho2 = mutacao(filho2);
-
-            nova_geracao[i] = filho1;
-            nova_geracao[i + 1] = filho2;
-        }
-
-        // Substituir população
-        for (int i = 0; i < TAM_POPULACAO; i++) {
-            populacao[i] = nova_geracao[i];
-        }
-
-        aplicar_morte(populacao, geracao);
-
-        // Encontrar o melhor da geração
-        Individuo melhor = populacao[0];
-        for (int i = 1; i < TAM_POPULACAO; i++) {
-            if (populacao[i].fitness > melhor.fitness) {
-                melhor = populacao[i];
+            // Encontrar o melhor da geração
+            Individuo melhor = populacao[0];
+            for (int i = 1; i < TAM_POPULACAO; i++) {
+                if (populacao[i].fitness > melhor.fitness) {
+                    melhor = populacao[i];
+                }
             }
+
+            imprimir_populacao(populacao, geracao);
+        
+
+            printf("\n>>> Geracao %d | Melhor Fitness: %.2f\n", geracao, melhor.fitness);
+            imprimir_individuo(melhor);
         }
-
-        imprimir_populacao(populacao, geracao);
-       
-
-        printf("\n>>> Geracao %d | Melhor Fitness: %.2f\n", geracao, melhor.fitness);
-        imprimir_individuo(melhor);
     }
+    if (rank == 3){
+        printf("\n\n============= INICIANDO A BUSCA PELO MELHOR INDIVIDUO =============\n\n");
+        
+        inicializar_parametros();
 
+        inicializar_populacao(populacao);
+
+
+        for (int geracao = 0; geracao < MAX_GER; geracao++) {
+
+            for (int i = 0; i < TAM_POPULACAO; i += 2) {
+                Individuo pai = torneio(populacao);
+                Individuo mae = torneio(populacao);
+
+                Individuo filho1, filho2;
+                cruzamento(pai, mae, &filho1, &filho2);
+
+                filho1 = mutacao(filho1);
+                filho2 = mutacao(filho2);
+
+                nova_geracao[i] = filho1;
+                nova_geracao[i + 1] = filho2;
+            }
+
+            // Substituir população
+            for (int i = 0; i < TAM_POPULACAO; i++) {
+                populacao[i] = nova_geracao[i];
+            }
+
+            aplicar_morte(populacao, geracao);
+
+            // Encontrar o melhor da geração
+            Individuo melhor = populacao[0];
+            for (int i = 1; i < TAM_POPULACAO; i++) {
+                if (populacao[i].fitness > melhor.fitness) {
+                    melhor = populacao[i];
+                }
+            }
+
+            imprimir_populacao(populacao, geracao);
+        
+
+            printf("\n>>> Geracao %d | Melhor Fitness: %.2f\n", geracao, melhor.fitness);
+            imprimir_individuo(melhor);
+        }
+    }
+    MPI_Finalize();
     return 0;
 }
 
@@ -427,10 +445,3 @@ void inicializar_parametros() {
         PESO_RAD, PESO_FOME, PESO_ENERGIA, PESO_SANIDADE, PESO_DOENCA,
         PESO_RAD + PESO_FOME + PESO_ENERGIA + PESO_SANIDADE + PESO_DOENCA);
 }
-
-
-
-
-
-
-
