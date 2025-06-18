@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <math.h>
 #include <time.h>
-#include <mpi.h>
+#include "mpi.h"
 
 
 #define BITS_POR_GENE 8
@@ -110,8 +110,17 @@ void master_controlador() {
                      i+1, TAG_MELHORES, MPI_COMM_WORLD, &requests[i]);
         }
         
+            // Imprimir população da ilha após evolução
+        //imprimir_populacao(ilhas[ilha], geracao, ilha);
+
         // 2. Processar enquanto aguarda (pode fazer análise ou logging)
         MPI_Waitall(3, requests, MPI_STATUSES_IGNORE);
+
+        printf("\n[MASTER] Melhores indivíduos recebidos na geração %d:\n", geracao);
+        for (int i = 0; i < 3; i++) {
+            printf("Ilha %d: ", i+1);
+            imprimir_individuo(melhores_ilhas[i]);
+        }
         
         // 3. Selecionar os melhores para migração (estratégia elitista)
         Individuo melhores_para_migrar[3];
@@ -270,6 +279,14 @@ void inicializar_populacao(Individuo indviduo[]) {
 
 }
 
+void imprimir_populacao(Individuo populacao[], int geracao, int ilha) {
+    printf("\n==== População da Ilha %d - Geração %d ====\n", ilha + 1, geracao);
+    for (int i = 0; i < TAM_POPULACAO; i++) {
+        printf("Indivíduo %d: ", i);
+        imprimir_individuo(populacao[i]);
+    }
+}
+
 // Seleção por torneio
 Individuo torneio(Individuo populacao[]) {
     
@@ -322,7 +339,7 @@ Individuo mutacao(Individuo individuo) {
     
     return individuo;
 }
-
+ /*
 void imprimir_populacao (Individuo populacao[], int geracao)
 {
         printf("\n==== Populacao - Geracao %d ====\n", geracao);
@@ -333,6 +350,7 @@ void imprimir_populacao (Individuo populacao[], int geracao)
             printf("\n");
         }
 }
+*/
 
 // Impressão/
 void imprimir_individuo(Individuo ind) {
